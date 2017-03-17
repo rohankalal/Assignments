@@ -7,13 +7,16 @@
 -- these lines here.
 
 
-create table players(id serial primary key,name varchar(50));
+CREATE TABLE Players (id SERIAL primary key,name varchar(255));
 
-create table playerstandings (id int references players(id),name varchar(50) ,wins int,matches int);
+CREATE TABLE Matches (id SERIAL primary key,player int references Players(id),opponent int references Players(id),result int);
 
-create table swisspairings(id1 int references players(id), name1 varchar(50),id2 int references players(id), name2 varchar(50));
+CREATE VIEW Wins AS SELECT Players.id, COUNT(Matches.opponent) AS n FROM Players LEFT JOIN (SELECT * FROM Matches WHERE result>0) as Matches	ON Players.id = Matches.player GROUP BY Players.id;
 
-create table matches(id serial,PlayerId int references Players(id),OpponentId int referneces Players(Id),Winner int);
 
-create table wins(id int references players(id),WinNum int);
+CREATE VIEW Count AS SELECT Players.id, Count(Matches.opponent) AS n FROM Players LEFT JOIN Matches ON Players.id = Matches.player GROUP BY Players.id;
+
+
+CREATE VIEW Standings AS SELECT Players.id,Players.name,Wins.n as wins,Count.n as matches FROM Players,Count,Wins WHERE Players.id = Wins.id and Wins.id = Count.id;
+
 
